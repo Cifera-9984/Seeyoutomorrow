@@ -1,6 +1,6 @@
 # SEE YOU TOMORROW♪
 
-> 昔涟的个人主页，分享我的项目与生活
+> 我的个人主页，分享我的项目与生活
 
 ## 预览
 
@@ -47,7 +47,7 @@
 
 ## 作者
 
-**昔涟 (Cifera)**
+**可以可以 (Cifera)**
 
 - GitHub: [@Cifera-9984](https://github.com/Cifera-9984)
 
