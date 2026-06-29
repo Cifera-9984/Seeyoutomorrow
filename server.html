@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Forge Minecraft 服务器 - 集成模组的高自由度生存服务器" />
+  <meta name="keywords" content="Minecraft,Forge,服务器,模组生存" />
+  <meta property="og:title" content="Forge 服务器介绍 | SEE YOU TOMORROW♪" />
+  <meta property="og:description" content="集成 Forge 模组的高自由度生存服务器" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="images/forge-server.jpg" />
+  <title>Forge 服务器介绍 | SEE YOU TOMORROW♪</title>
+  <!-- 预加载自定义字体，避免字体闪烁 -->
+  <link rel="preload" href="ttf/ziti.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 优先应用用户自定义设置，避免闪屏 -->
+  <script>
+    (function() {
+      const defaults = { hue: 220, textColor: '#ffffff', bgSlideshow: true, sakura: true, textShadow: true, welcome: true };
+      const saved = JSON.parse(localStorage.getItem('site-settings') || '{}');
+      const settings = Object.assign({}, defaults, saved);
+      document.documentElement.style.setProperty('--primary-hue', settings.hue);
+      const hex = settings.textColor || '#ffffff';
+      const rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      const r = rgb ? parseInt(rgb[1], 16) : 255;
+      const g = rgb ? parseInt(rgb[2], 16) : 255;
+      const b = rgb ? parseInt(rgb[3], 16) : 255;
+      document.documentElement.style.setProperty('--text-color', hex);
+      document.documentElement.style.setProperty('--text-color-rgb', `${r}, ${g}, ${b}`);
+      if (settings.textShadow === false) {
+        document.documentElement.classList.add('no-text-shadow');
+      }
+    })();
+  </script>
+  <style>
+    /* 子页单独微调 */
+    .sub-page { 
+      min-height: 100vh; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      padding-top: 80px; /* 避开固定导航栏 */
+    }
+    .sub-card { max-width: 700px; margin: 40px 20px; padding: 40px; }
+    .sub-card h1 { margin-bottom: 20px; text-align: center; }
+    .sub-card p { margin-bottom: 16px; line-height: 1.8; }
+    .server-ip-box { 
+      background: rgba(0,0,0,0.2); 
+      padding: 15px; 
+      border-radius: 8px; 
+      font-family: monospace; 
+      text-align: center; 
+      margin: 10px 0; 
+      user-select: all; /* 方便玩家复制IP */
+    }
+  </style>
+  <!-- 注意：这里之前有多余的 script，我已经删除了 -->
+</head>
+<body>
+
+  <!-- 开屏遮罩 -->
+  <div id="splash"></div>
+  
+  <!-- 背景 -->
+  <div class="bg-overlay">
+    <div class="bg-slide active"></div>
+    <div class="bg-slide"></div>
+  </div>
+
+  <!-- 导航栏 -->
+  <header class="top-nav">
+    <nav class="nav-inner">
+      <a href="index.html" class="logo">SEE YOU TOMORROW♪</a>
+      <ul class="nav-list">
+        <li><a href="index.html#home">首页</a></li>
+        <li><a href="index.html#about">关于我</a></li>
+        <li><a href="index.html#projects">项目</a></li>
+        <li><a href="index.html#contact">联系我</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="切换导航">☰</button>
+    </nav>
+  </header>
+
+  <!-- 内容区域 -->
+  <section class="module glass sub-page">
+    <div class="container sub-card">
+      <img src="images/forge-server.jpg" alt="服务器封面" class="server-banner">
+      <h1>[Forge] Minecraft 服务器</h1>
+      
+      <p><strong>版本：</strong>1.20.1</p>
+      <p><strong>模组：</strong>Tacz、暮色森林、天镜、淬炼 等多种游戏玩法 Mod</p>
+      
+      <div class="server-ip-box">
+         mc.seeyoutomorrow.top<br>
+         sr.seeyoutomorrow.top
+      </div>
+      <p style="text-align: center; font-size: 0.9em; opacity: 0.8;">【请加入群获取最新 IP 及客户端】</p>
+
+      <p><strong>白名单/申请方式：</strong>无正版验证，无白名单</p>
+      <p><strong>规则：</strong>禁止破坏、禁止偷盗、文明用语；死亡不掉落。</p>
+      <p><strong>硬件：</strong>Ryzen 7 4800H + 32 G 内存，不定时随机备份，有问题可回档。</p>
+      
+      <!-- 按钮组 -->
+      <div class="btn-group" style="justify-content: center;">
+        <a href="https://qm.qq.com/cgi-bin/qm/qr?k=YOUR_QGROUP_KEY" target="_blank" class="btn btn-primary">加入Q群</a>
+        <a href="index.html" class="btn btn-outline">返回首页</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 只引入这一个 main.js，它会自动处理打字机效果 -->
+  <script src="js/main.js"></script>
+  <!-- Lenis 惯性滚动 -->
+  <script src="https://unpkg.com/lenis@1/dist/lenis.min.js"></script>
+  <script>
+    window.lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      smoothWheel: true,
+    });
+    function raf(time) { window.lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  </script>
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    &copy; 2025-2026 SEE YOU TOMORROW♪ &nbsp;|&nbsp; <a href="index.html">返回主页</a>
+  </footer>
+</body>
+</html>

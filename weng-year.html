@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="翁法罗斯一年历 - 崩坏：星穹铁道主题日历" />
+  <meta name="keywords" content="翁法罗斯,星穹铁道,崩铁,日历,一年历" />
+  <meta property="og:title" content="翁法罗斯一年历 | SEE YOU TOMORROW♪" />
+  <meta property="og:description" content="崩坏：星穹铁道翁法罗斯一年历" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="images/weng-banner.jpg" />
+  <title>翁法罗斯一年历 | SEE YOU TOMORROW♪</title>
+  <!-- 预加载自定义字体，避免字体闪烁 -->
+  <link rel="preload" href="ttf/ziti.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- 优先应用用户自定义设置，避免闪屏 -->
+  <script>
+    (function() {
+      const defaults = { hue: 220, textColor: '#ffffff', bgSlideshow: true, sakura: true, textShadow: true, welcome: true };
+      const saved = JSON.parse(localStorage.getItem('site-settings') || '{}');
+      const settings = Object.assign({}, defaults, saved);
+      document.documentElement.style.setProperty('--primary-hue', settings.hue);
+      const hex = settings.textColor || '#ffffff';
+      const rgb = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      const r = rgb ? parseInt(rgb[1], 16) : 255;
+      const g = rgb ? parseInt(rgb[2], 16) : 255;
+      const b = rgb ? parseInt(rgb[3], 16) : 255;
+      document.documentElement.style.setProperty('--text-color', hex);
+      document.documentElement.style.setProperty('--text-color-rgb', `${r}, ${g}, ${b}`);
+      if (settings.textShadow === false) {
+        document.documentElement.classList.add('no-text-shadow');
+      }
+    })();
+  </script>
+  <style>
+    /* === 页面专用布局 === */
+    .calendar-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 80px; /* 避开导航栏 */
+      padding-bottom: 40px;
+    }
+
+    /* 大容器：左图右历 */
+    .weng-container {
+      display: flex;
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(255, 255, 255, 0.55); /* 稍微不透明一点，为了看清日历 */
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      margin: 0 20px;
+/* 加一个白色描边增加精致感 */
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    /* --- 左侧：人物海报区 --- */
+    .left-panel {
+      flex: 0 0 400px; /* 固定宽度 400px */
+      position: relative;
+      overflow: hidden;
+      background: #000; /* 图片未加载时的底色 */
+    }
+
+    .char-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 铺满不拉伸 */
+      transition: transform 0.5s ease;
+    }
+    .left-panel:hover .char-img {
+      transform: scale(1.03); /* 鼠标放上去轻微放大 */
+    }
+
+    /* 图片上的文字遮罩 */
+    .text-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 30px 20px;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .month-name-big {
+      font-size: 2.5rem;
+      font-weight: bold;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .char-name {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    .lucky-flower {
+      font-size: 0.85rem;
+      opacity: 0.7;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* 右上角的语录 */
+    .quote-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      text-align: right;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      font-size: 0.9rem;
+      font-style: italic;
+      max-width: 80%;
+    }
+
+    /* --- 右侧：日历交互区 --- */
+    .right-panel {
+      flex: 1; /* 占满剩余空间 */
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.15); /* 纯白半透明 */
+      display: flex;
+      flex-direction: column;
+      /* 加上一点模糊，提升磨砂感 */
+      backdrop-filter: blur(8px); 
+      /* 给文字加一点点白色描边/阴影，防止背景太花看不清字 */
+      text-shadow: 0 0 10px rgba(255,255,255,0.8);
+    }
+
+    /* 确保日期文字在深色背景上也清晰 */
+    .current-date-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #222; 
+      text-shadow: 0 1px 1px rgba(255,255,255,0.9);
+    }
+
+    .day-item {
+      font-weight: 500; /* 加粗一点点 */
+    }
+
+    /* === 2. 新增：动画过渡类 === */
+    /* 定义一个通用的动画容器状态 */
+    .anim-content {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+    
+    /* 当添加这个类时，元素隐藏（淡出+轻微位移） */
+    .anim-content.fade-out {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98); /* 稍微下沉并缩小 */
+      filter: blur(4px); /* 变模糊 */
+    }
+    
+    /* 图片单独的动画：稍微放大一点淡出 */
+    .char-img {
+      transition: transform 0.6s ease, opacity 0.4s ease;
+    }
+    .char-img.fade-out {
+      opacity: 0.5;
+      transform: scale(1.1); /* 图片切换时放大 */
+    }
+
+    /* 顶部控制栏 */
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .current-date-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #333; /* 深色文字 */
+    }
+    
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: none;
+      background: var(--primary); /* 使用你主题的主色 */
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: .2s;
+    }
+    .nav-btn:hover { background: #0053d9; }
+
+    /* 日历网格 */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    /* 星期头 */
+    .weekday-item {
+      font-weight: bold;
+      color: #666;
+      padding-bottom: 10px;
+      font-size: 0.9rem;
+    }
+    /* 周末标题标红 */
+    .weekday-item:first-child,
+    .weekday-item:last-child {
+      color: #d64040;
+    }
+
+    /* 日期格子 */
+    .day-item {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      cursor: default;
+      transition: .2s;
+    }
+    
+    /* 普通悬停 */
+    .day-item:not(.empty):hover {
+      background: rgba(0, 102, 255, 0.1);
+    }
+
+    /* 周末格子背景 (模仿截图的红色块，但做淡一点) */
+    .day-item.weekend {
+      background: rgba(214, 64, 64, 0.08);
+      color: #a00;
+    }
+
+    /* 今天高亮 */
+    .day-item.today {
+      background: var(--primary) !important;
+      color: #fff !important;
+      box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+    }
+
+    /* 底部链接 */
+    .footer-links {
+      margin-top: auto; /* 推到底部 */
+      padding-top: 20px;
+      display: flex;
+      gap: 15px;
+      font-size: 0.85rem;
+      color: #666;
+    }
+    .footer-links a:hover { color: var(--primary); text-decoration: underline; }
+
+    /* 手机适配：上下排列 */
+    @media (max-width: 768px) {
+      .weng-container { flex-direction: column; }
+      .left-panel { height: 300px; flex: none; }
+      .right-panel { padding: 20px; }
+      .day-item { height: 40px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. 开屏 & 背景 -->
+  <div id="splash"></div>
+  <div class="bg-overlay">
+    <div class="bg-slide active"></div>
+    <div class="bg-slide"></div>
+  </div>
+
+  <!-- 2. 导航栏 -->
+  <header class="top-nav">
+    <nav class="nav-inner">
+      <a href="index.html" class="logo">SEE YOU TOMORROW♪</a>
+      <ul class="nav-list">
+        <li><a href="index.html#home">首页</a></li>
+        <li><a href="index.html#about">关于我</a></li>
+        <li><a href="index.html#projects">项目</a></li>
+        <li><a href="index.html#contact">联系我</a></li>
+      </ul>
+      <button class="nav-toggle">☰</button>
+    </nav>
+  </header>
+
+  <!-- 3. 日历主内容 -->
+  <section class="calendar-page">
+    <div class="weng-container">
+      
+      <!-- 左侧：人物海报 -->
+      <div class="left-panel">
+        <!-- 图片源：默认加载 m1.jpg -->
+        <img src="images/m1.jpg" alt="Character" class="char-img" id="char-image">
+        
+        <!-- 右上角语录 -->
+        <div class="quote-box" id="quote-text">
+          不论晴天还是雨天，进入梦乡以前，<br>记得和自己说一声：「明天见」！
+        </div>
+
+        <!-- 底部文字 -->
+        <div class="text-overlay anim-content" id="left-anim-box">
+          <div class="month-name-big" id="month-name">门关月</div>
+          <div class="char-name">
+            <span id="char-name">铃兰</span> 
+            <span style="font-size:0.6em; margin-left:6px; opacity:0.6;">CN</span>
+          </div>
+          <span class="lucky-flower" id="lucky-flower">本月幸运花：铃兰</span>
+        </div>
+      </div>
+
+      <!-- 右侧：日历 -->
+      <div class="right-panel">
+        
+        <div class="cal-header">
+          <button class="nav-btn" id="prev-btn"><i class="fa fa-chevron-left"></i></button>
+          <div class="current-date-title" id="calendar-title">2026年 1月</div>
+          <button class="nav-btn" id="next-btn"><i class="fa fa-chevron-right"></i></button>
+        </div>
+
+        <div class="calendar-grid anim-content" id="right-anim-box">
+          <!-- 星期头 -->
+          <div class="weekday-item">Sun</div>
+          <div class="weekday-item">Mon</div>
+          <div class="weekday-item">Tue</div>
+          <div class="weekday-item">Wed</div>
+          <div class="weekday-item">Thu</div>
+          <div class="weekday-item">Fri</div>
+          <div class="weekday-item">Sat</div>
+          
+          <!-- 日期格子由 JS 生成 -->
+          <div id="days-wrapper" style="display: contents;"></div>
+        </div>
+
+        <div class="footer-links">
+          <span>StarRail</span>
+          <span>|</span>
+          <span>崩坏:星穹铁道</span>
+          <a href="index.html" style="margin-left: auto; color: var(--primary);">返回主页 <i class="fa fa-arrow-right"></i></a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 引入你的 main.js (处理导航栏和开屏) -->
+  <script src="js/main.js"></script>
+  <!-- Lenis 惯性滚动 -->
+  <script src="https://unpkg.com/lenis@1/dist/lenis.min.js"></script>
+  <script>
+    window.lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      smoothWheel: true,
+    });
+    function raf(time) { window.lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  </script>
+
+  <script>
+/* =========================================
+       已修复并优化排版的数据配置
+       img: 确保你的图片命名为 m1.jpg 到 m12.jpg
+    ========================================= */
+    const monthData = [
+      { 
+        monthName: "门关月", 
+        char: "提宝", 
+        flower: "铃兰", 
+        quote: "不论晴天还是雨天，进入梦乡以前，<br>记得和自己说一声：「明天见」！", 
+        img: "images/m1.jpg" 
+      },
+      { 
+        monthName: "平衡月", 
+        char: "刻律德菈", 
+        flower: "水晶花", 
+        quote: "无我，即无世界。<br>去思，去见，去征服。", 
+        img: "images/m2.jpg" 
+      },
+      { 
+        monthName: "长夜月", 
+        char: "三月七/长夜月", 
+        flower: "四叶草", 
+        quote: "如果岁月是个无穷的轮回——那就忘掉不断重复的苦涩，<br>单独记住每个快乐的瞬间吧！", 
+        img: "images/m3.jpg" 
+      },
+      { 
+        monthName: "耕耘月", 
+        char: "丹恒•腾荒", 
+        flower: "兰花", 
+        quote: "笔终会折断，墨终会耗尽，生命终会逝去，<br>但思想将在史诗中永垂不朽。", 
+        img: "images/m4.jpg" 
+      },
+      { 
+        monthName: "欢喜月", 
+        char: "海瑟音", 
+        flower: "睡莲", 
+        quote: "世事如沧海，潮起潮落，一切终会在浪中消逝。<br>所以，请在生命的每一刻都纵情高歌吧。", 
+        img: "images/m5.jpg" 
+      },
+      { 
+        monthName: "长昼月", 
+        char: "风堇", 
+        flower: "向日葵", 
+        quote: "多望望天，多笑一笑；<br>好多缠人的病痛，最怕乐观这剂良药！", 
+        img: "images/m6.jpg" 
+      },
+      { 
+        monthName: "自由月", 
+        char: "白厄", 
+        flower: "勿忘我", 
+        quote: "每个人的心中都住着一个英雄。<br>拥抱它，然后去追逐太阳吧。", 
+        img: "images/m7.jpg" 
+      },
+      { 
+        monthName: "收获月", 
+        char: "那刻夏", 
+        flower: "无尽夏", 
+        quote: "「真理是溶解世界万物的溶剂，因而绝无法在客观上存在」——<br>对此，本人心中已有绝妙的证明。", 
+        img: "images/m8.jpg" 
+      },
+      { 
+        monthName: "拾线月", 
+        char: "阿格莱雅", 
+        flower: "金桂", 
+        quote: "信任与无私，是世上最美丽的两件华服：<br>一件赠予他人，一件装扮自己。", 
+        img: "images/m9.jpg" 
+      },
+      { 
+        monthName: "纷争月", 
+        char: "万敌", 
+        flower: "石榴花", 
+        quote: "去杀死玩耍，游戏便会诞生。<br>去杀死纷争，荣光必然降临。", 
+        img: "images/m10.jpg" 
+      },
+      { 
+        monthName: "哀悼月", 
+        char: "遐蝶", 
+        flower: "金鱼草", 
+        quote: "若心灵仍有余裕，请稍许分出些温柔，<br>轻抚身边美好的一切吧。", 
+        img: "images/m11.jpg" 
+      },
+      { 
+        monthName: "机缘月", 
+        char: "赛飞儿", 
+        flower: "猫草", 
+        quote: "别怕摔，跑起来！<br>命运就是只迟缓的若虫，它压根抓不住你！", 
+        img: "images/m12.jpg" 
+      }
+    ];
+
+    /* ================= 核心逻辑 ================= */
+    let currentYear = 2026; // 截图里是 2026 年
+    let currentMonth = 0;   // 0 = 1月
+
+    const daysWrapper = document.getElementById('days-wrapper');
+    const titleEl = document.getElementById('calendar-title');
+    
+    // 左侧元素
+    const imgEl = document.getElementById('char-image');
+    const quoteEl = document.getElementById('quote-text');
+    const mNameEl = document.getElementById('month-name');
+    const cNameEl = document.getElementById('char-name');
+    const flowEl = document.getElementById('lucky-flower');
+
+    function render() {
+      // 1. 更新左侧信息
+      const data = monthData[currentMonth];
+      if (data) {
+        imgEl.src = data.img;
+        quoteEl.innerHTML = data.quote; // 支持 <br>
+        mNameEl.textContent = data.monthName;
+        cNameEl.textContent = data.char;
+        flowEl.textContent = "本月幸运花：" + data.flower;
+      }
+
+      // 2. 更新标题
+      titleEl.textContent = `${currentYear}年 ${currentMonth + 1}月`;
+
+      // 3. 生成日历网格
+      daysWrapper.innerHTML = '';
+      
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay(); // 0(Sun) - 6(Sat)
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      // 填充空白
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'day-item empty';
+        daysWrapper.appendChild(empty);
+      }
+
+      // 填充日期
+      const today = new Date();
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'day-item';
+        dayEl.textContent = d;
+
+        // 计算星期几
+        const weekDay = new Date(currentYear, currentMonth, d).getDay();
+        // 周日(0) 或 周六(6) 加上 weekend 样式
+        if (weekDay === 0 || weekDay === 6) {
+          dayEl.classList.add('weekend');
+        }
+
+        // 检查是不是"今天"
+        if (currentYear === today.getFullYear() && 
+            currentMonth === today.getMonth() && 
+            d === today.getDate()) {
+          dayEl.classList.add('today');
+        }
+
+        daysWrapper.appendChild(dayEl);
+      }
+    }
+
+    // 初始化
+    render();
+
+// ================= 新增：动画切换逻辑 =================
+
+    // 1. 获取要做动画的元素 (请确保你在 HTML 里加了对应的 id)
+    const leftBox = document.getElementById('left-anim-box');
+    const rightBox = document.getElementById('right-anim-box');
+    const charImg = document.getElementById('char-image');
+    const titleAnim = document.getElementById('calendar-title');
+
+    // 2. 封装一个带动画的切换函数
+    function switchMonthWithAnim(direction) {
+      // A. 开始动画：加上 fade-out 类，让元素变透明、下沉
+      if(leftBox) leftBox.classList.add('fade-out');
+      if(rightBox) rightBox.classList.add('fade-out');
+      if(charImg) charImg.classList.add('fade-out');
+      
+      // 标题也淡出
+      titleAnim.style.opacity = '0';
+      titleAnim.style.transition = 'opacity 0.3s';
+
+      // B. 等待 0.35秒，让消失动画播完
+      setTimeout(() => {
+        // --- 核心：修改月份数据 ---
+        if (direction === 'next') {
+          currentMonth++;
+          if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+          }
+        } else {
+          currentMonth--;
+          if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+          }
+        }
+
+        // --- 重新渲染页面内容 ---
+        render();
+
+        // C. 结束动画：移除 fade-out 类，让元素重新浮现
+        if(leftBox) leftBox.classList.remove('fade-out');
+        if(rightBox) rightBox.classList.remove('fade-out');
+        if(charImg) charImg.classList.remove('fade-out');
+        
+        // 标题淡入
+        titleAnim.style.opacity = '1';
+
+      }, 350); // 这里的时间必须跟 CSS 里的 transition 时间匹配
+    }
+
+    // 3. 绑定新的按钮点击事件
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      switchMonthWithAnim('prev'); // 上一个月
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      switchMonthWithAnim('next'); // 下一个月
+    });
+  </script>
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    &copy; 2025-2026 SEE YOU TOMORROW♪ &nbsp;|&nbsp; <a href="index.html">返回主页</a>
+  </footer>
+</body>
+</html>
