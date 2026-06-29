@@ -4,7 +4,7 @@
 
 ## 预览
 
-访问 [GitHub Pages](https://cifera-9984.github.io/Seeyoutomorrow/) 查看在线预览。
+访问 [Seeyoutomorrow](https://www.seeyoutomorrow.top/) 查看在线预览。
 
 ## 功能特性
 
